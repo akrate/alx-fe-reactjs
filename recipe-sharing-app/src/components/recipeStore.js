@@ -4,78 +4,48 @@ export const useRecipeStore = create((set) => ({
   recipes: [],
 
   addRecipe: (newRecipe) =>
-    set((state) => {
-      const newRecipes = [...state.recipes, newRecipe];
-
-      const search = state.searchTerm.toLowerCase();
-      const filtered =
-        search.trim() === ''
-          ? newRecipes
-          : newRecipes.filter((recipe) =>
-              recipe.title.toLowerCase().includes(search)
-            );
-
-      return {
-        recipes: newRecipes,
-        filteredRecipes: filtered,
-      };
-    }),
+    set((state) => ({
+      recipes: [...state.recipes, newRecipe],
+    })),
 
   deleteRecipe: (id) =>
-    set((state) => {
-      const newRecipes = state.recipes.filter((recipe) => recipe.id !== id);
-
-      const search = state.searchTerm.toLowerCase();
-      const filtered =
-        search.trim() === ''
-          ? newRecipes
-          : newRecipes.filter((recipe) =>
-              recipe.title.toLowerCase().includes(search)
-            );
-
-      return {
-        recipes: newRecipes,
-        filteredRecipes: filtered,
-      };
-    }),
+    set((state) => ({
+      recipes: state.recipes.filter((recipe) => recipe.id !== id),
+    })),
 
   updateRecipe: (updatedRecipe) =>
-    set((state) => {
-      const newRecipes = state.recipes.map((recipe) =>
+    set((state) => ({
+      recipes: state.recipes.map((recipe) =>
         recipe.id === updatedRecipe.id ? { ...recipe, ...updatedRecipe } : recipe
-      );
-
-      const search = state.searchTerm.toLowerCase();
-      const filtered =
-        search.trim() === ''
-          ? newRecipes
-          : newRecipes.filter((recipe) =>
-              recipe.title.toLowerCase().includes(search)
-            );
-
-      return {
-        recipes: newRecipes,
-        filteredRecipes: filtered,
-      };
-    }),
+      ),
+    })),
 
   searchTerm: '',
-  filteredRecipes: [],
+  setSearchTerm: (term) => set({ searchTerm: term }),
 
-  setSearchTerm: (term) =>
+  favorites: [],
+
+  addFavorite: (recipeId) =>
     set((state) => {
-      const search = term.toLowerCase();
+      if (state.favorites.includes(recipeId)) return state; 
+      return { favorites: [...state.favorites, recipeId] };
+    }),
 
-      const filtered =
-        search.trim() === ''
-          ? state.recipes
-          : state.recipes.filter((recipe) =>
-              recipe.title.toLowerCase().includes(search)
-            );
+  removeFavorite: (recipeId) =>
+    set((state) => ({
+      favorites: state.favorites.filter((id) => id !== recipeId),
+    })),
 
-      return {
-        searchTerm: term,
-        filteredRecipes: filtered,
-      };
+  recommendations: [],
+
+  generateRecommendations: () =>
+    set((state) => {
+      if (state.recipes.length === 0) {
+        return { recommendations: [] };
+      }
+
+      const recommended = state.recipes.filter(() => Math.random() > 0.5);
+
+      return { recommendations: recommended };
     }),
 }));
