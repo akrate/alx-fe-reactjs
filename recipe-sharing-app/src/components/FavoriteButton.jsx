@@ -1,32 +1,24 @@
-import { useRecipeStore } from '../recipeStore';
+import { useRecipeStore } from './recipeStore';
 
-const FavoritesList = () => {
-  const favoritesRecipes = useRecipeStore((state) =>
-    state.favorites
-      .map((id) => state.recipes.find((recipe) => recipe.id === id))
-      .filter(Boolean)
-  );
+const FavoriteButton = ({ recipeId }) => {
+  const { favorites, addFavorite, removeFavorite } = useRecipeStore((state) => ({
+    favorites: state.favorites,
+    addFavorite: state.addFavorite,
+    removeFavorite: state.removeFavorite,
+  }));
 
-  if (favoritesRecipes.length === 0) {
-    return (
-      <div>
-        <h2>My Favorites</h2>
-        <p>You have no favorite recipes yet.</p>
-      </div>
-    );
-  }
+  const isFavorite = favorites.includes(recipeId);
+
+  const toggleFavorite = () => {
+    if (isFavorite) removeFavorite(recipeId);
+    else addFavorite(recipeId);
+  };
 
   return (
-    <div>
-      <h2>My Favorites</h2>
-      {favoritesRecipes.map((recipe) => (
-        <div key={recipe.id} style={{ marginBottom: '1rem' }}>
-          <h3>{recipe.title}</h3>
-          <p>{recipe.description}</p>
-        </div>
-      ))}
-    </div>
+    <button onClick={toggleFavorite}>
+      {isFavorite ? '★ Remove Favorite' : '☆ Add Favorite'}
+    </button>
   );
 };
 
-export default FavoritesList;
+export default FavoriteButton;
