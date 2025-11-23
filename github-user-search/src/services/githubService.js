@@ -4,8 +4,6 @@ const GITHUB_API_BASE_URL = 'https://api.github.com';
 
 /**
  * Fetch user data from GitHub API
- * @param {string} username - GitHub username to search for
- * @returns {Promise<Object>} User data from GitHub
  */
 export const fetchUserData = async (username) => {
   try {
@@ -21,16 +19,11 @@ export const fetchUserData = async (username) => {
 
 /**
  * Advanced search for GitHub users
- * @param {Object} params - Search parameters
- * @param {string} params.username - Username to search
- * @param {string} params.location - User location
- * @param {number} params.minRepos - Minimum number of repositories
- * @param {number} params.page - Page number for pagination (default: 1)
- * @returns {Promise<Object>} Search results from GitHub
+ * Uses GitHub Search API: https://api.github.com/search/users?q
  */
 export const searchUsers = async ({ username, location, minRepos, page = 1 }) => {
   try {
-    // Build query string based on provided parameters
+    // Build query string
     let query = [];
     
     if (username) {
@@ -45,17 +38,16 @@ export const searchUsers = async ({ username, location, minRepos, page = 1 }) =>
       query.push(`repos:>=${minRepos}`);
     }
     
-    // Join query parts with space
     const queryString = query.join(' ');
     
-    // Make API request with pagination
+    // Make request to: https://api.github.com/search/users?q={query}
     const response = await axios.get(
-      `${GITHUB_API_BASE_URL}/search/users`,
+      'https://api.github.com/search/users?q',
       {
         params: {
           q: queryString,
           page: page,
-          per_page: 10 // Results per page
+          per_page: 10
         }
       }
     );
