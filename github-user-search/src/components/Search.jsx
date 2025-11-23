@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { searchUsers } from '../services/githubService';
+import { searchUsers, fetchUserData } from '../services/githubService';
 
 const Search = () => {
   // Form state
@@ -17,9 +17,6 @@ const Search = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
 
-  /**
-   * Handle input changes
-   */
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -28,22 +25,13 @@ const Search = () => {
     }));
   };
 
-  /**
-   * Handle form submission
-   */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Reset state
     setCurrentPage(1);
     await performSearch(1);
   };
 
-  /**
-   * Perform search with current form data
-   */
   const performSearch = async (page) => {
-    // Validate at least one field is filled
     if (!formData.username && !formData.location && !formData.minRepos) {
       return;
     }
@@ -60,15 +48,13 @@ const Search = () => {
       });
       
       if (page === 1) {
-        // New search - replace results
         setUsers(data.items);
       } else {
-        // Load more - append results
         setUsers(prev => [...prev, ...data.items]);
       }
       
       setTotalCount(data.total_count);
-      setHasMore(data.items.length === 10); // Check if there are more results
+      setHasMore(data.items.length === 10);
       
     } catch (err) {
       setError(true);
@@ -78,9 +64,6 @@ const Search = () => {
     }
   };
 
-  /**
-   * Load more results
-   */
   const handleLoadMore = () => {
     const nextPage = currentPage + 1;
     setCurrentPage(nextPage);
@@ -200,34 +183,27 @@ const Search = () => {
               className="bg-white rounded-lg shadow-md p-6 hover:shadow-xl transition"
             >
               <div className="flex items-start gap-4">
-                {/* Avatar */}
                 <img
                   src={user.avatar_url}
                   alt={user.login}
                   className="w-20 h-20 rounded-full border-2 border-gray-200"
                 />
                 
-                {/* User Info */}
                 <div className="flex-1">
                   <h3 className="text-xl font-bold text-gray-800 mb-1">
                     {user.login}
                   </h3>
                   
-                  {/* User Details */}
                   <div className="flex flex-wrap gap-4 text-sm text-gray-600 mb-3">
                     {user.location && (
                       <span className="flex items-center gap-1">
                         📍 {user.location}
                       </span>
                     )}
-                    <span className="flex items-center gap-1">
-                      📚 Repos: {user.public_repos || 'N/A'}
-                    </span>
                   </div>
                   
-                  {/* Profile Link */}
-                  <a
-                    href={user.html_url}
+                  
+                    <a href={user.html_url}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-block bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium transition"
