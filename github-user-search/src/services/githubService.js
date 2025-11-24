@@ -13,6 +13,9 @@ export const fetchUserData = async (username) => {
     if (error.response && error.response.status === 404) {
       throw new Error('User not found');
     }
+    if (error.response && error.response.status === 403) {
+      throw new Error('API rate limit exceeded. Please try again later.');
+    }
     throw new Error('Failed to fetch user data');
   }
 };
@@ -38,6 +41,11 @@ export const searchUsers = async ({ username, location, minRepos, page = 1 }) =>
       query.push(`repos:>=${minRepos}`);
     }
     
+    // Validate query
+    if (query.length === 0) {
+      throw new Error('Please provide at least one search criteria');
+    }
+    
     const queryString = query.join(' ');
     
     // Make request to: https://api.github.com/search/users?q={query}
@@ -54,6 +62,9 @@ export const searchUsers = async ({ username, location, minRepos, page = 1 }) =>
     
     return response.data;
   } catch (error) {
-    throw new Error('Failed to search users');
+    if (error.response && error.response.status === 403) {
+      throw new Error('API rate limit exceeded. Please try again later.');
+    }
+    throw new Error(error.message || 'Failed to search users');
   }
 };
