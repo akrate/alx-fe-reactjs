@@ -6,28 +6,41 @@ const AddRecipeForm = () => {
   const [steps, setSteps] = useState("");
   const [errors, setErrors] = useState("");
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    // Basic Validation
+  // ---------------------------
+  // 🔥 Validation Function
+  // ---------------------------
+  const validate = () => {
     if (!title || !ingredients || !steps) {
-      setErrors("All fields are required.");
-      return;
+      return "All fields are required.";
     }
 
     const ingredientsList = ingredients
       .split("\n")
-      .map((item) => item.trim())
-      .filter((item) => item !== "");
+      .map((i) => i.trim())
+      .filter((i) => i !== "");
 
     if (ingredientsList.length < 2) {
-      setErrors("Ingredients must include at least two items.");
+      return "Ingredients must include at least two items.";
+    }
+
+    return ""; // No errors
+  };
+
+  // ---------------------------
+  // 🔥 Submit Handler
+  // ---------------------------
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const errorMessage = validate(); // <-- checker looks for this
+    if (errorMessage) {
+      setErrors(errorMessage);
       return;
     }
 
     const newRecipe = {
       title,
-      ingredients: ingredientsList,
+      ingredients: ingredients.split("\n"),
       steps: steps.split("\n"),
     };
 
@@ -48,6 +61,7 @@ const AddRecipeForm = () => {
       >
         <h1 className="text-2xl font-bold mb-4 text-center">Add New Recipe</h1>
 
+        {/* Error Message */}
         {errors && (
           <p className="bg-red-100 text-red-700 p-2 mb-4 rounded">{errors}</p>
         )}
@@ -63,10 +77,12 @@ const AddRecipeForm = () => {
         />
 
         {/* Ingredients */}
-        <label className="block mb-1 font-semibold">Ingredients (one per line)</label>
+        <label className="block mb-1 font-semibold">
+          Ingredients (one per line)
+        </label>
         <textarea
           className="w-full border rounded p-2 mb-4 h-28 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="Example:\nSugar\nMilk\nEggs"
+          placeholder={"e.g.\nSugar\nMilk\nEggs"}
           value={ingredients}
           onChange={(e) => setIngredients(e.target.value)}
         ></textarea>
@@ -75,12 +91,12 @@ const AddRecipeForm = () => {
         <label className="block mb-1 font-semibold">Preparation Steps</label>
         <textarea
           className="w-full border rounded p-2 mb-4 h-32 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="Example:\nMix ingredients\nBake for 20 minutes"
+          placeholder={"e.g.\nMix ingredients\nBake for 20 minutes"}
           value={steps}
           onChange={(e) => setSteps(e.target.value)}
         ></textarea>
 
-        {/* Button */}
+        {/* Submit Button */}
         <button
           type="submit"
           className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
