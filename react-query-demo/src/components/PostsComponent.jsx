@@ -1,4 +1,4 @@
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 
 const fetchPosts = async () => {
   const response = await fetch(
@@ -19,8 +19,14 @@ const PostsComponent = () => {
     isError,
     error,
     refetch,
-  } = useQuery("posts", fetchPosts, {
-    staleTime: 1000 * 60, // 1 minute (caching)
+  } = useQuery({
+    queryKey: ["posts"],
+    queryFn: fetchPosts,
+
+    cacheTime: 1000 * 60 * 5,          // 5 minutes
+    staleTime: 1000 * 60,              // 1 minute
+    refetchOnWindowFocus: false,
+    keepPreviousData: true,
   });
 
   if (isLoading) {
@@ -41,7 +47,6 @@ const PostsComponent = () => {
         {data.slice(0, 10).map((post) => (
           <li key={post.id}>
             <strong>{post.title}</strong>
-            <p>{post.body}</p>
           </li>
         ))}
       </ul>
